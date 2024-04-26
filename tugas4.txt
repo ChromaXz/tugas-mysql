@@ -1,0 +1,61 @@
+Microsoft Windows [Version 10.0.22631.3527]
+(c) Microsoft Corporation. All rights reserved.
+
+C:\Users\ASUS>cd \xampp\mysql\bin
+
+C:\xampp\mysql\bin>mysql -u root -p
+Enter password:
+Welcome to the MariaDB monitor.  Commands end with ; or \g.
+Your MariaDB connection id is 178
+Server version: 10.4.27-MariaDB mariadb.org binary distribution
+
+Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current inputstatement.
+
+MariaDB [(none)]> use dbpos_sib6
+Database changed
+MariaDB [dbpos_sib6]> START TRANSACTION;
+Query OK, 0 rows affected (0.001 sec)
+
+MariaDB [dbpos_sib6]> INSERT INTO jenis_produk (nama) VALUES
+    -> ('Pakaian'),
+    -> ('Keyboard'),
+    -> ('Mouse');
+Query OK, 3 rows affected (0.005 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+
+MariaDB [dbpos_sib6]> UPDATE produk
+    -> SET stok = 50
+    -> WHERE id IN (
+    -> SELECT id
+    -> FROM produk
+    -> WHERE jenis_produk_id = (
+    -> SELECT id
+    -> FROM jenis_produk
+    -> WHERE nama = 'Pakaian')
+    -> );
+Query OK, 0 rows affected (0.041 sec)
+Rows matched: 0  Changed: 0  Warnings: 0
+
+MariaDB [dbpos_sib6]> SAVEPOINT update_stok_pakaian;
+Query OK, 0 rows affected (0.001 sec)
+
+MariaDB [dbpos_sib6]> DELETE FROM pesanan where total > 1000000;
+ERROR 1451 (23000): Cannot delete or update a parent row: a foreignkey constraint fails (`dbpos_sib6`.`pesanan_items`, CONSTRAINT `fk_pesanan_items_pesanan1` FOREIGN KEY (`pesanan_id`) REFERENCES `pesanan` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION)
+MariaDB [dbpos_sib6]> DELETE FROM jenis_produk WHERE id=10;
+Query OK, 1 row affected (0.001 sec)
+
+MariaDB [dbpos_sib6]> ROLLBACK TO SAVEPOINT update_stok_elektronik;
+ERROR 1305 (42000): SAVEPOINT update_stok_elektronik does not exist
+MariaDB [dbpos_sib6]> ROLLBACK TO SAVEPOINT update_stok_pakaian;
+Query OK, 0 rows affected (0.004 sec)
+
+MariaDB [dbpos_sib6]> UPDATE kartu SET diskon = 0.1 WHERE nama = 'Silver';
+Query OK, 1 row affected (0.001 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+MariaDB [dbpos_sib6]> COMMIT;
+Query OK, 0 rows affected (0.003 sec)
+
+MariaDB [dbpos_sib6]>
