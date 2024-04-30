@@ -1,0 +1,136 @@
+Microsoft Windows [Version 10.0.22631.3527]
+(c) Microsoft Corporation. All rights reserved.
+
+C:\Users\ASUS>cd \xampp\mysql\bin
+
+C:\xampp\mysql\bin>mysql -u root -p
+Enter password:
+Welcome to the MariaDB monitor.  Commands end with ; or \g.
+Your MariaDB connection id is 48
+Server version: 10.4.27-MariaDB mariadb.org binary distribution
+
+Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+MariaDB [(none)]> use dbpos_sib6
+Database changed
+MariaDB [dbpos_sib6]> DELIMITER $$
+MariaDB [dbpos_sib6]> CREATE FUNCTION kategori_harga(harga DOUBLE)
+    -> RETURNS VARCHAR(20);
+    -> BEGIN
+    -> DECLARE kategori VARCHAR(20);
+    -> IF harga BETWEEN 0 AND 500000 THEN
+    -> SET kategori = 'murah';
+    -> ELSEIF harga BETWEEN 500001 AND 300000
+0 THEN
+    -> SET kategori = 'sedang';
+    -> ELSEIF harga BETWEEN 3000001 AND 10000
+000 THEN
+    -> SET kategori='mahal';
+    -> ELSE
+    -> SET kategori='sangat mahal';
+    -> END IF;
+    -> RETURN kategori;
+    -> END $$
+ERROR 1064 (42000): You have an error in your SQL syntax; checkthe manual that corresponds to your MariaDB server version for the right syntax to use near ';
+BEGIN
+DECLARE kategori VARCHAR(20);
+IF harga BETWEEN 0 AND 500000 THEN
+SET ...' at line 2
+MariaDB [dbpos_sib6]> DELIMITER ;
+MariaDB [dbpos_sib6]> CREATE FUNCTION kategori_harga(harga DOUBLE)
+    -> RETURNS VARCHAR(20)
+    -> BEGIN
+    -> DECLARE kategori VARCHAR(20);
+ERROR 1064 (42000): You have an error in your SQL syntax; checkthe manual that corresponds to your MariaDB server version for the right syntax to use near '' at line 4
+MariaDB [dbpos_sib6]> DELIMITER $$
+MariaDB [dbpos_sib6]> CREATE FUNCTION kategori_harga(harga DOUBLE)
+    -> RETURNS VARCHAR(20)
+    -> BEGIN
+    -> DECLARE kategori VARCHAR(20);
+    -> IF harga BETWEEN 0 AND 500000 THEN
+    -> SET kategori = 'murah';
+    -> ELSEIF harga BETWEEN 500001 AND 3000000 THEN
+    -> SET kategori = 'sedang';
+    -> ELSEIF harga BETWEEN 3000001 AND 10000000 THEN
+    -> SET kategori='mahal';
+    -> ELSE
+    -> SET kategori='sangat mahal';
+    -> END IF;
+    -> RETURN kategori;
+    -> END $$
+Query OK, 0 rows affected (0.053 sec)
+
+MariaDB [dbpos_sib6]> DELIMITER ;
+MariaDB [dbpos_sib6]> SELECT nama, harga_jual
+, kategori_harga(harga_jual) AS kategori_harg
+a FROM produk;
++-------------------+------------+----------------+
+| nama              | harga_jual | kategori_harga |
++-------------------+------------+----------------+
+| Televisi 21 inchs |   50500000 | sangat mahal   |
+| Televisi 40 inch  |    7440000 | mahal          |
+| Kulkas 2 pintu    |    4680000 | mahal          |
+| Meja Makan        |     600000 | sedang         |
+| Teh Kotak         |       3850 | murah          |
+| PC Desktop HP     |    9984000 | mahal          |
+| Teh Botol         |       2750 | murah          |
+| Notebook Acer S   |   11232000 | sangat mahal   |
+| Notebook Lenovo   |   12480000 | sangat mahal   |
+| Laptop Lenovo     |   16000000 | sangat mahal   |
+| Kopi              |      33000 | murah          |
+| Teh Sosro 2       |      15000 | murah          |
+| Laptop Asus       |    5000000 | mahal          |
+| Televisi 22 inc`  |   50500000 | sangat mahal   |
+| Televisi 23 inc   |   50500000 | sangat mahal   |
+| Televisi 24 inc   |   50500000 | sangat mahal   |
+| Televisi 25 inc   |   50500000 | sangat mahal   |
+| Televisi 27 inc   |   50500000 | sangat mahal   |
+| Televisi 28 inc   |   50500000 | sangat mahal   |
+| Televisi 29 inc   |   50500000 | sangat mahal   |
+| Teh Pucuk         |       5500 | murah          |
+| Teh Pucuk2        |       5500 | murah          |
++-------------------+------------+----------------+
+22 rows in set (0.020 sec)
+
+MariaDB [dbpos_sib6]> SELECT * FROM pesanan;
++----+------------+---------+--------------+
+| id | tanggal    | total   | pelanggan_id |
++----+------------+---------+--------------+
+|  1 | 2015-11-04 | 9720000 |            1 |
+|  2 | 2015-11-04 |   17500 |            3 |
+|  3 | 2015-11-04 |       0 |            6 |
+|  4 | 2015-11-04 |       0 |            7 |
+|  5 | 2015-11-04 |       0 |           10 |
+|  6 | 2015-11-04 |       0 |            2 |
+|  7 | 2015-11-04 |       0 |            5 |
+|  8 | 2015-11-04 |       0 |            4 |
+|  9 | 2015-11-04 |       0 |            8 |
+| 10 | 2015-11-04 |       0 |            9 |
+| 11 | 2015-11-04 |   30000 |            9 |
+| 12 | 2020-11-04 |   40000 |            9 |
++----+------------+---------+--------------+
+12 rows in set (0.001 sec)
+
+MariaDB [dbpos_sib6]> ALTER TABLE pembayaran ADD stat
+us_pembayaran varchar(25);
+ERROR 1060 (42S21): Duplicate column name 'status_pembayaran'
+MariaDB [dbpos_sib6]> DELIMITER $$
+MariaDB [dbpos_sib6]> DELIMITER ;
+MariaDB [dbpos_sib6]> DELIMITER $$
+MariaDB [dbpos_sib6]> CREATE PROCEDURE kurangi_stok(IN produk_id INT, IN jumlah_pesanan INT)
+    -> BEGIN
+    -> DECLARE stok_produk INT;
+    -> SELECT stok INTO stok_produk FROM produk WHERE id = produ
+k_id;
+    -> SET stok_produk = stok_produk - jumlah_pesanan;
+    -> IF stok_produk < 0 THEN
+    -> SIGNAL SQLSTATE '45000'
+    -> SET MESSAGE_TEXT = 'Stok produk tidak mencukupi';
+    -> END IF;
+    -> UPDATE produk SET stok = stok_produk WHERE id = produk_id;
+    -> END $$
+ERROR 1304 (42000): PROCEDURE kurangi_stok already exists
+MariaDB [dbpos_sib6]> DELIMITER ;
+MariaDB [dbpos_sib6]>
